@@ -8,7 +8,7 @@ export default function AppRouter() {
     <div>
         <Routes>
             <Route path='/' element={<Home/>}/>
-            <Route path='user/login' element={<Login/>}/>
+            <Route path='/user/login' element={<Login/>}/>
             <Route path='user/register' element={<SignUp/>}/>
 
         </Routes>

@@ -2,14 +2,25 @@ import React from "react";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllProducts } from "../../redux/thunk/productThunk";
+import axios from "axios";
 export default function Home() {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product.allProducts);
-  console.log("products ".products)
+  // console.log("products ",products)
+
+
+  // async function getData(){
+  //   const data = await axios.get("http://localhost:5000/product")
+  //   console.log("data",data)
+  // }
   useEffect(() => {
     dispatch(getAllProducts());
+  
   }, [dispatch]);
+  if(products.length<=0) return <h1>loading</h1>
   return (
+    <>
+    {}
     <div>
       <div>
         <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
@@ -110,7 +121,7 @@ export default function Home() {
             </h2>
 
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-              {products.data.map((product) => (
+              {products?.data?.map((product) => (
                 <div key={product._id} className="group relative">
                   <img
                     alt={product.imageAlt}
@@ -120,13 +131,9 @@ export default function Home() {
                   <div className="mt-4 flex justify-between">
                     <div>
                       <h3 className="text-sm text-gray-700">
-                        {/* <a href={product.href}>
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-0"
-                          /> */}
+                        
                         {product.name}
-                        {/* </a> */}
+                        
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
                         {product.description}
@@ -143,5 +150,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </>
   );
 }

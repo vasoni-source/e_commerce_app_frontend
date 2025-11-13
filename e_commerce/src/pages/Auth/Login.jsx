@@ -8,7 +8,7 @@ export default function Login() {
   console.log("user from login",user)
  const [email,setEmail]=useState("");
  const [password,setPassword]=useState("");
-const handleSubmit = ()=>{
+const handleSubmit = (e)=>{
   e.preventDefault();
   dispatch(loginWithPassword({email,password}))
 }
@@ -27,7 +27,7 @@ const handleSubmit = ()=>{
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form action="#" method="POST" className="space-y-6"onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="email"
