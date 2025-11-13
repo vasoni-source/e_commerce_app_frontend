@@ -8,6 +8,9 @@ export default function Navbar() {
   const handleNavigate = ()=>{
     navigator("/user/login")
   }
+  const handleCartNavigation = ()=>{
+    navigator("/cart");
+  }
   return (
      <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,7 +43,7 @@ export default function Navbar() {
             </button>
 
             {/* Cart */}
-            <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors relative">
+            <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors relative" onClick={handleCartNavigation}>
               <ShoppingCart className="h-6 w-6" />
               <span className="text-sm font-medium">Cart</span>
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">

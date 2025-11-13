@@ -9,8 +9,8 @@ export const loginWithPassword = createAsyncThunk(
         password,
       });
 
-      console.log("response from api ", res.data);
-
+      console.log("response from api ", res.data.token);
+      localStorage.setItem("token",res.data.token)
       return res.data;
     } catch (error) {
       console.log("error", error);

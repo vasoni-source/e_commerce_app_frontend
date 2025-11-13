@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllProducts } from "../../redux/thunk/productThunk";
 import axios from "axios";
+import { addToCart } from "../../redux/thunk/cartThunk";
 export default function Home() {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product.allProducts);
@@ -17,6 +18,9 @@ export default function Home() {
     dispatch(getAllProducts());
   
   }, [dispatch]);
+  const handleCart =(id)=>{
+    dispatch(addToCart({ productId: id, quantity: 1 }));
+  }
   if(products.length<=0) return <h1>loading</h1>
   return (
     <>
@@ -143,6 +147,7 @@ export default function Home() {
                       {product.price}
                     </p>
                   </div>
+                  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleCart(product._id)}>Add to cart</button>
                 </div>
               ))}
             </div>
