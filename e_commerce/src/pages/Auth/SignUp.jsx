@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { signUp } from "../../redux/thunk/authThunk";
+import { useDispatch } from "react-redux";
 export default function SignUp() {
   const navigator = useNavigate();
+  const dispatch = useDispatch();
   const [openOtpField, setOpenOtpField] = useState(false);
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
@@ -37,6 +40,12 @@ export default function SignUp() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    console.log("formdata from signup page",form);
+    dispatch(signUp(form))
+    setOpenOtpField(false)
+  }
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -51,7 +60,7 @@ export default function SignUp() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm/6 font-medium text-black-100">
               Name
@@ -138,7 +147,7 @@ export default function SignUp() {
             <button
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              disabled={!otpSent}
+              
             >
               Sign up
             </button>

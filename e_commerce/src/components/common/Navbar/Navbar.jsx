@@ -7,6 +7,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const navigator = useNavigate();
    const products = useSelector((state) => state?.cart?.cart?.items);
+   const user = useSelector((state)=>state.user.user);
    const cartItems = products? products.length : 0;
   const handleNavigate = ()=>{
     navigator("/user/login")
@@ -59,6 +60,7 @@ export default function Navbar() {
               <User className="h-6 w-6" />
               <span className="text-sm font-medium">Login</span>
             </button>
+           
 
             {/* Sign Up Button */}
             {/* <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium">

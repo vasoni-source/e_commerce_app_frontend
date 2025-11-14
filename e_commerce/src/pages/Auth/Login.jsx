@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginWithPassword } from "../../redux/thunk/authThunk";
+import { useNavigate } from "react-router-dom";
 export default function Login() {
   const dispatch = useDispatch();
+  const navigator = useNavigate();
   const user = useSelector((state) => state.user.user);
   console.log("user from login", user);
   const [email, setEmail] = useState("");
@@ -12,6 +14,7 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginWithPassword({ email, password }));
+    navigator("/")
   };
 
   return (

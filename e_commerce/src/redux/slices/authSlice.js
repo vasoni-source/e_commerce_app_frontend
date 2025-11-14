@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginWithPassword } from "../thunk/authThunk";
+import { loginWithPassword ,signUp} from "../thunk/authThunk";
 
 const initialState = {
   user: {},
@@ -24,7 +24,21 @@ export const productSlice = createSlice({
       })
       .addCase(loginWithPassword.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
-      });
+      });  
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(signUp.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(signUp.fulfilled, (state, action) => {
+        state.status = "succeded";
+        // state.token = action.payload;
+        state.user = action.payload
+      })
+      .addCase(signUp.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      });  
   },
 });
 export default productSlice.reducer;
