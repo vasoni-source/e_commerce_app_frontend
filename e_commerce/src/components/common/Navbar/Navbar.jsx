@@ -1,10 +1,13 @@
 import React,{ useState } from 'react'
 import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigator = useNavigate();
+   const products = useSelector((state) => state?.cart?.cart?.items);
+   const cartItems = products? products.length : 0;
   const handleNavigate = ()=>{
     navigator("/user/login")
   }
@@ -47,7 +50,7 @@ export default function Navbar() {
               <ShoppingCart className="h-6 w-6" />
               <span className="text-sm font-medium">Cart</span>
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                3
+                {cartItems}
               </span>
             </button>
 

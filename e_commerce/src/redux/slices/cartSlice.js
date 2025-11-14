@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addToCart } from "../thunk/cartThunk";
+import { addToCart ,getCart,removeCartItem} from "../thunk/cartThunk";
 
 const initialState = {
   cart: {},
@@ -21,6 +21,32 @@ export const cartSlice = createSlice({
         state.cart = action.payload;
       })
       .addCase(addToCart.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      });
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getCart.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getCart.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.cart = action.payload;
+      })
+      .addCase(getCart.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      });
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(removeCartItem.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(removeCartItem.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.cart = action.payload;
+      })
+      .addCase(removeCartItem.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
       });
   },

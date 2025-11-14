@@ -21,7 +21,7 @@ export default function Home() {
   const handleCart =(id)=>{
     dispatch(addToCart({ productId: id, quantity: 1 }));
   }
-  if(products.length<=0) return <h1>loading</h1>
+  if(products?.length<=0) return <h1>loading</h1>
   return (
     <>
     {}

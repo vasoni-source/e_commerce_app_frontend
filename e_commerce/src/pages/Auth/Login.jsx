@@ -5,14 +5,15 @@ import { loginWithPassword } from "../../redux/thunk/authThunk";
 export default function Login() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
-  console.log("user from login",user)
- const [email,setEmail]=useState("");
- const [password,setPassword]=useState("");
-const handleSubmit = (e)=>{
-  e.preventDefault();
-  dispatch(loginWithPassword({email,password}))
-}
-  
+  console.log("user from login", user);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [openOtpField,setOpenOtpField] = useState(false)
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(loginWithPassword({ email, password }));
+  };
+
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -40,7 +41,7 @@ const handleSubmit = (e)=>{
                 id="email"
                 name="email"
                 type="email"
-                onChange={(e)=>setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
@@ -70,7 +71,7 @@ const handleSubmit = (e)=>{
                 id="password"
                 name="password"
                 type="password"
-                onChange={(e)=>setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
