@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 export default function SignUp() {
   const navigator = useNavigate();
   const [openOtpField, setOpenOtpField] = useState(false);
@@ -15,19 +16,16 @@ export default function SignUp() {
   });
   const sendOtp = async (e) => {
     e.preventDefault();
-console.log("email",form.email)
+    console.log("email", form.email);
     if (!form.email) {
       return setMessage("Email is required");
     }
     const email = form.email;
     setMessage("");
     try {
-      console.log("inside try")
-      const res = await axios.post(
-        "http://localhost:5000/user/register/send-otp",
-        { email, }
-      );
-      console.log("response",res)
+      console.log("inside try");
+     const res = await axios.post("http://localhost:5000/user/register/send-otp",{email});
+      console.log("response", res);
       setMessage(res.data.message);
       setOpenOtpField(true);
       setOtpSent(true);
@@ -131,7 +129,7 @@ console.log("email",form.email)
 
           <button
             className="flex w-6xs justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            onClick={sendOtp}
+            onClick={(e)=>sendOtp(e)}
           >
             Generate Otp
           </button>
