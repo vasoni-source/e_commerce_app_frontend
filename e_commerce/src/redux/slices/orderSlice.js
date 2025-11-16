@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createOrder } from "../thunk/orderThunk";
+import { createOrder ,getOrders} from "../thunk/orderThunk";
 
 const initialState = {
-  order: {},
+  order: [],
   status: null,
   error: null,
 };
@@ -21,6 +21,18 @@ export const orderSlice = createSlice({
         state.order = action.payload;
       })
       .addCase(createOrder.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      })
+      // getorders 
+
+      .addCase(getOrders.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getOrders.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.order = action.payload;
+      })
+      .addCase(getOrders.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
       });
   },

@@ -8,6 +8,7 @@ export default function Navbar() {
   const navigator = useNavigate();
    const products = useSelector((state) => state?.cart?.cart?.items);
    const user = useSelector((state)=>state.user.user);
+   const isAuthenticated = useSelector((state)=>state.user.isAuthenticated)
    const cartItems = products? products.length : 0;
   const handleNavigate = ()=>{
     navigator("/user/login")
@@ -55,17 +56,16 @@ export default function Navbar() {
               </span>
             </button>
 
-            {/* User/Login */}
-            <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors" onClick={handleNavigate}>
+            {
+              isAuthenticated ?  <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+              onClick={()=>navigator("/profile")} >
+               <User className="h-6 w-6" />
+             </button> : <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors" onClick={handleNavigate}>
               <User className="h-6 w-6" />
               <span className="text-sm font-medium">Login</span>
             </button>
-           
-
-            {/* Sign Up Button */}
-            {/* <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
-              Sign Up
-            </button> */}
+            }
+            
           </div>
 
           {/* Mobile menu button */}

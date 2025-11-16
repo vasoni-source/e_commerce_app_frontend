@@ -25,7 +25,7 @@ export const addToCart = createAsyncThunk(
     } catch (error) {
       console.log("error", error);
       return rejectWithValue(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || "Failed. to add to cart Please try again."
       );
     }
   }
@@ -49,7 +49,7 @@ export const getCart = createAsyncThunk(
     } catch (error) {
       console.log("error", error);
       return rejectWithValue(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || " Failed to find cart Please try again."
       );
     }
   }
@@ -77,7 +77,7 @@ export const removeCartItem = createAsyncThunk(
     } catch (error) {
       console.log("error", error);
       return rejectWithValue(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || "Failed to remove cart Please try again."
       );
     }
   }

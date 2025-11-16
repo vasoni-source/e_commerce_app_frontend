@@ -1,11 +1,13 @@
 import React from "react";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllProducts } from "../../redux/thunk/productThunk";
+import { useNavigate } from "react-router-dom";
+import { getAllProducts, getProductById } from "../../redux/thunk/productThunk";
 import axios from "axios";
 import { addToCart } from "../../redux/thunk/cartThunk";
 export default function Home() {
   const dispatch = useDispatch();
+  const navigator = useNavigate();
   const products = useSelector((state) => state.product.allProducts);
   // console.log("products ",products)
 
@@ -21,6 +23,11 @@ export default function Home() {
   const handleCart =(id)=>{
     dispatch(addToCart({ productId: id, quantity: 1 }));
   }
+  const handleNavigate = (id)=>{
+    console.log("prosuct id fronm home page",id);
+    dispatch(getProductById(id))
+    navigator(`/product_detail/${id}`)
+  }
   if(products?.length<=0) return <h1>loading</h1>
   return (
     <>
@@ -32,6 +39,7 @@ export default function Home() {
             src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply"
             alt=""
             className="absolute inset-0 -z-10 size-full object-cover object-right md:object-center"
+       
           />
           <div
             aria-hidden="true"
@@ -131,6 +139,7 @@ export default function Home() {
                     alt={product.imageAlt}
                     src={product.imageUrl}
                     className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+                    onClick={()=>handleNavigate(product._id)}
                   />
                   <div className="mt-4 flex justify-between">
                     <div>
@@ -147,7 +156,7 @@ export default function Home() {
                       {product.price}
                     </p>
                   </div>
-                  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleCart(product._id)}>Add to cart</button>
+                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleCart(product._id)}>Add to cart</button>
                 </div>
               ))}
             </div>

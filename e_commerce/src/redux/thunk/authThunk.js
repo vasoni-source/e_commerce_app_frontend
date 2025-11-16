@@ -16,7 +16,7 @@ export const signUp = createAsyncThunk(
     } catch (error) {
       console.log("error", error);
       return rejectWithValue(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || "SignUp failed. Please try again."
       );
     }
   }
@@ -37,6 +37,42 @@ export const loginWithPassword = createAsyncThunk(
       console.log("error", error);
       return rejectWithValue(
         error.response?.data?.message || "Login failed. Please try again."
+      );
+    }
+  }
+);
+// FORGOT PASSWORD
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (email, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/user/forgot-password",
+        { email }
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to send reset email"
+      );
+    }
+  }
+);
+
+// RESET PASSWORD
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async ({ token, password }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        "http://localhost:5000/user/reset-password",
+        { token, password }
+      );
+
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to reset password"
       );
     }
   }

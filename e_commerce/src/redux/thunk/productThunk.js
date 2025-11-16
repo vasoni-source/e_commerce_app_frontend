@@ -17,3 +17,20 @@ export const getAllProducts = createAsyncThunk('product',async()=>{
       }
     
 })
+export const getProductById = createAsyncThunk('productDetail',async(id)=>{
+  try {
+      console.log("id from product thunk",id);
+   
+    const res = await axios.get(`http://localhost:5000/product/${id}`,{
+ id
+    });
+    
+    console.log("response from api ",res.data);
+    
+   return res.data;
+      
+    } catch (error) {
+      console.log("error",error)
+    }
+  
+})
