@@ -7,6 +7,7 @@ import Cart from '../pages/User/Cart';
 import Otp from '../pages/Auth/Otp';
 import Profile from "../pages/User/Profile"
 import ProductDetail from '../pages/Home/ProductDetail';
+import Wishlist from '../pages/User/Wishlist';
 export default function AppRouter() {
   return (
     <div>
@@ -18,6 +19,8 @@ export default function AppRouter() {
             <Route path='/user/register' element={<SignUp/>}/>
             <Route path='/profile' element={<Profile/>}/>
             <Route path='/cart' element={<Cart/>}/>
+            <Route path='/wishlist' element={<Wishlist/>}/>
+
         </Routes>
     </div>
   )

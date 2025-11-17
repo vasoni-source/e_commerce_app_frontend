@@ -1,28 +1,34 @@
-import React,{ useState } from 'react'
-import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Search, ShoppingCart, Heart, User, Menu, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 export default function Navbar() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigator = useNavigate();
-   const products = useSelector((state) => state?.cart?.cart?.items);
-   const user = useSelector((state)=>state.user.user);
-   const isAuthenticated = useSelector((state)=>state.user.isAuthenticated)
-   const cartItems = products? products.length : 0;
-  const handleNavigate = ()=>{
-    navigator("/user/login")
-  }
-  const handleCartNavigation = ()=>{
+  const products = useSelector((state) => state?.cart?.cart?.items);
+  const user = useSelector((state) => state.user.user);
+  //  const isAuthenticated = useSelector((state)=>state.user.isAuthenticated)
+  const cartItems = products ? products.length : 0;
+  const handleNavigate = () => {
+    navigator("/user/login");
+  };
+  const handleCartNavigation = () => {
     navigator("/cart");
-  }
+  };
   return (
-     <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-indigo-600">ShopLogo</h1>
+            <h1
+              className="text-2xl font-bold text-indigo-600"
+              onClick={() => navigator("/")}
+              style={{ cursor: "pointer" }}
+            >
+              ShopLogo
+            </h1>
           </div>
 
           {/* Search Bar - Desktop */}
@@ -42,13 +48,19 @@ export default function Navbar() {
           {/* Navigation Items - Desktop */}
           <div className="hidden md:flex items-center space-x-6">
             {/* Wishlist */}
-            <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors">
+            <button
+              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+              onClick={() => navigator("/wishlist")}
+            >
               <Heart className="h-6 w-6" />
               <span className="text-sm font-medium">Wishlist</span>
             </button>
 
             {/* Cart */}
-            <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors relative" onClick={handleCartNavigation}>
+            <button
+              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors relative"
+              onClick={handleCartNavigation}
+            >
               <ShoppingCart className="h-6 w-6" />
               <span className="text-sm font-medium">Cart</span>
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -56,16 +68,22 @@ export default function Navbar() {
               </span>
             </button>
 
-            {
-              isAuthenticated ?  <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
-              onClick={()=>navigator("/profile")} >
-               <User className="h-6 w-6" />
-             </button> : <button className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors" onClick={handleNavigate}>
-              <User className="h-6 w-6" />
-              <span className="text-sm font-medium">Login</span>
-            </button>
-            }
-            
+            {user ? (
+              <button
+                className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+                onClick={() => navigator("/profile")}
+              >
+                <User className="h-6 w-6" />
+              </button>
+            ) : (
+              <button
+                className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+                onClick={handleNavigate}
+              >
+                <User className="h-6 w-6" />
+                <span className="text-sm font-medium">Login</span>
+              </button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -74,7 +92,11 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 hover:text-indigo-600"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -102,7 +124,7 @@ export default function Navbar() {
               <Heart className="h-6 w-6" />
               <span className="font-medium">Wishlist</span>
             </button>
-            
+
             <button className="flex items-center space-x-3 text-gray-700 hover:text-indigo-600 w-full py-2 relative">
               <ShoppingCart className="h-6 w-6" />
               <span className="font-medium">Cart</span>
@@ -110,12 +132,12 @@ export default function Navbar() {
                 3
               </span>
             </button>
-            
+
             <button className="flex items-center space-x-3 text-gray-700 hover:text-indigo-600 w-full py-2">
               <User className="h-6 w-6" />
               <span className="font-medium">Login</span>
             </button>
-            
+
             <button className="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
               Sign Up
             </button>
@@ -123,5 +145,5 @@ export default function Navbar() {
         </div>
       )}
     </nav>
-  )
+  );
 }

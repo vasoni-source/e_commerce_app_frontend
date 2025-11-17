@@ -1,10 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loginWithPassword ,signUp,forgotPassword,resetPassword} from "../thunk/authThunk";
 import updateUserField from "../thunk/userThunk"
+import Cookies from 'js-cookie';
+let parsedUser = null;
+const userCookie = Cookies.get('user');
+
+if (userCookie) {
+  try {
+    parsedUser = JSON.parse(userCookie);
+  } catch (err) {
+    console.error("Error parsing user cookie:", err);
+    parsedUser = null;
+  }
+}
+console.log("parsed user",parsedUser)
 const initialState = {
-  user: {},
+  user: parsedUser,
   token: "",
-  isAuthenticated:false,
+  // isAuthenticated:false,
   status: null,
   error: null,
   message:"",
@@ -13,7 +26,12 @@ const initialState = {
 export const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    logOut:(state)=>{
+      state.user = null,
+      localStorage.removeItem("token");
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginWithPassword.pending, (state) => {
@@ -23,7 +41,7 @@ export const userSlice = createSlice({
         state.status = "succeded";
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.isAuthenticated = true;
+        // state.isAuthenticated = true;
       })
       .addCase(loginWithPassword.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
@@ -36,7 +54,7 @@ export const userSlice = createSlice({
         state.status = "succeded";
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.isAuthenticated = true;
+        // state.isAuthenticated = true;
       })
       .addCase(signUp.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
@@ -77,4 +95,5 @@ export const userSlice = createSlice({
       })
   },
 });
+export const {logOut} = userSlice.actions;
 export default userSlice.reducer;

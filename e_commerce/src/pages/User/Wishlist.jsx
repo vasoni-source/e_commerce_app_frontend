@@ -1,7 +1,44 @@
-import React from 'react'
-
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { ShoppingBag } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { getWishlist } from "../../redux/thunk/wishlistThunk";
 export default function Wishlist() {
+  const dispatch = useDispatch();
+const wishlist = useSelector((state)=>state.wishlist.wishlist);
+console.log("wishlist from redux ",wishlist)
+useEffect(()=>{
+  dispatch(getWishlist())
+},[dispatch])
   return (
-    <div>Wishlist</div>
-  )
+    <div className="bg-white rounded-lg shadow">
+      <div className="p-6 border-b">
+        <h3 className="text-xl font-semibold text-gray-900">My Wishlist</h3>
+      </div>
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {wishlist.items?.map((item) => (
+          <div
+            key={item._id}
+            className="border rounded-lg overflow-hidden hover:shadow-lg transition"
+          >
+            <img
+              src={item.imageUrl}
+              alt={item.name}
+              className="w-full h-48 object-cover"
+            />
+            <div className="p-4">
+              <h4 className="font-semibold text-gray-900 mb-2">{item.name}</h4>
+              <p className="text-lg font-bold text-indigo-600 mb-3">
+                ${item.price}
+              </p>
+              <button className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+                <ShoppingBag className="w-4 h-4" />
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

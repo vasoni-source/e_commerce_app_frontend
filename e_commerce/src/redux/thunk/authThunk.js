@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import Cookies from 'js-cookie';
 export const signUp = createAsyncThunk(
   "auth/signUp",
   async ( formData , { rejectWithValue }) => {
@@ -32,6 +33,9 @@ export const loginWithPassword = createAsyncThunk(
 
       console.log("response from api ", res.data.token);
       localStorage.setItem("token",res.data.token)
+      Cookies.set('token', res.data.token, { expires: 0.5 });
+      Cookies.set('user', JSON.stringify(res.data.user), { expires: 0.5 });
+
       return res.data;
     } catch (error) {
       console.log("error", error);
