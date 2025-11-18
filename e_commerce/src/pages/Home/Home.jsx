@@ -2,29 +2,34 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllProducts, getProductById } from "../../redux/thunk/productThunk";
+import { filterProductByCategory, getAllProducts, getProductById ,searchProduct} from "../../redux/thunk/productThunk";
+import { setSelectedCategory } from "../../redux/slices/productSlice";
 import axios from "axios";
 import { addToCart } from "../../redux/thunk/cartThunk";
 import { getCart } from "../../redux/thunk/cartThunk";
 import { Heart } from "lucide-react";
-import {
-  addToWishlist,
-  removeWishlistItem,
-} from "../../redux/thunk/wishlistThunk";
+import { addToWishlist, getWishlist } from "../../redux/thunk/wishlistThunk";
 export default function Home() {
   const dispatch = useDispatch();
   const navigator = useNavigate();
+  useEffect(() => {
+    dispatch(getAllProducts());
+  }, [dispatch]);
+
   const products = useSelector((state) => state.product.allProducts);
   // const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const user = useSelector((state) => state.user.user);
+  const wishlist = useSelector((state) => state.wishlist.wishlist);
+  // const wishlistIds = wishlist?.items?.map((item) => item.productId);
   const [messages, setMessages] = useState({});
   console.log("user from home", user);
   useEffect(() => {
-    dispatch(getAllProducts());
     if (user) {
       dispatch(getCart());
+      dispatch(getWishlist());
     }
-  }, [dispatch]);
+  }, [dispatch, user]);
+
   const handleCart = (id, stock) => {
     if (user) {
       if (stock > 0) {
@@ -38,21 +43,44 @@ export default function Home() {
     }
   };
   const handleNavigate = (id) => {
-    console.log("prosuct id fronm home page", id);
+    console.log("product id fronm home page", id);
     dispatch(getProductById(id));
     navigator(`/product_detail/${id}`);
   };
   const [isInWishlist, setIsInWishlist] = useState(false);
   const handleWishlist = (productId) => {
-    if (isInWishlist) {
-      dispatch(removeWishlistItem(productId));
-    } else {
-      dispatch(addToWishlist(productId));
-    }
-
+    dispatch(addToWishlist(productId));
+    dispatch(getWishlist());
     setIsInWishlist(!isInWishlist);
   };
+  // 3. Save wishlist to localStorage
+  useEffect(() => {
+    if (wishlist?.items) {
+      const ids = wishlist.items.map((i) => i.productId._id);
+      localStorage.setItem("wishlistIds", JSON.stringify(ids));
+    }
+  }, [wishlist]);
+
+  // 4. Get wishlistIds safely (from backend OR localStorage)
+  const storedWishlistIds =
+    JSON.parse(localStorage.getItem("wishlistIds")) || [];
+
+  const wishlistIds =
+    wishlist?.items?.map((item) => item.productId._id) ||
+    JSON.parse(localStorage.getItem("wishlistIds")) ||
+    [];
+  console.log("wishlist ids", wishlistIds);
+  const searchQuery = useSelector((state) => state.product.searchQuery);
+  const selectedCategory = useSelector(
+    (state) => state.product.selectedCategory
+  );
+  const handleCategoryChange = (e) => {
+    const category = e.target.value;
+    console.log("category from home",category)
+    dispatch(filterProductByCategory( category ));
+  };
   if (products?.length <= 0) return <h1>loading</h1>;
+
   return (
     <>
       {}
@@ -154,6 +182,13 @@ export default function Home() {
           </div>
         </div>
         <div>
+          <select value={selectedCategory} onChange={handleCategoryChange}>
+            <option value="">All</option>
+            <option value="Mobile">Mobile</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Home And Kitchen"> Home And Kitchen</option>
+          </select>
           <div className="bg-white">
             <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
               <h2 className="text-2xl font-bold tracking-tight text-gray-900">
@@ -161,45 +196,53 @@ export default function Home() {
               </h2>
 
               <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                {products?.data?.map((product) => (
-                  <div key={product._id} className="group relative">
-                    <img
-                      alt={product.imageAlt}
-                      src={product.imageUrl}
-                      className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
-                      onClick={() => handleNavigate(product._id)}
-                    />
-                    <div className="mt-4 flex justify-between">
-                      <div>
-                        <h3 className="text-sm text-gray-700">
-                          {product.name}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {product.description}
+                {products?.data?.map((product) => {
+                  console.log("product id-", product._id);
+                  console.log("wishlistedId-", wishlistIds);
+                  const isWishlisted = wishlistIds?.includes(product._id);
+                  console.log("iswishlisted", isWishlisted);
+                  return (
+                    <div key={product._id} className="group relative">
+                      <img
+                        alt={product.imageAlt}
+                        src={product.imageUrl}
+                        className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+                        onClick={() => handleNavigate(product._id)}
+                      />
+                      <div className="mt-4 flex justify-between">
+                        <div>
+                          <h3 className="text-sm text-gray-700">
+                            {product.name}
+                          </h3>
+                          <p className="mt-1 text-sm text-gray-500">
+                            {product.description}
+                          </p>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">
+                          ${product.price}
                         </p>
                       </div>
-                      <p className="text-sm font-medium text-gray-900">
-                        ${product.price}
-                      </p>
-                    </div>
-                    <div className="flex justify-between">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => handleCart(product._id, product.stock)}
-                      >
-                        Add to cart
-                      </button>
-                      <Heart
-                        className="h-6 w-6"
-                        onClick={() => handleWishlist(product._id)}
-                      />
-                    </div>
+                      <div className="flex justify-between">
+                        <button
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                          onClick={() => handleCart(product._id, product.stock)}
+                        >
+                          Add to cart
+                        </button>
+                        <Heart
+                          className="h-6 w-6"
+                          fill={isWishlisted ? "red" : "none"}
+                          color={isWishlisted ? "red" : "currentColor"}
+                          onClick={() => handleWishlist(product._id)}
+                        />
+                      </div>
 
-                    {messages[product._id] && (
-                      <p className="text-red-900">{messages[product._id]}</p>
-                    )}
-                  </div>
-                ))}
+                      {messages[product._id] && (
+                        <p className="text-red-900">{messages[product._id]}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

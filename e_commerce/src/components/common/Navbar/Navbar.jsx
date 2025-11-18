@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import { Search, ShoppingCart, Heart, User, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllProducts,
+  searchProduct,
+} from "../../../redux/thunk/productThunk";
+import { setSearchQuery } from "../../../redux/slices/productSlice";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const dispatch = useDispatch();
   const navigator = useNavigate();
   const products = useSelector((state) => state?.cart?.cart?.items);
   const user = useSelector((state) => state.user.user);
@@ -15,6 +21,15 @@ export default function Navbar() {
   };
   const handleCartNavigation = () => {
     navigator("/cart");
+  };
+  const handleSearch = (searchQuery) => {
+    console.log("searcg from nav", searchQuery);
+    if (!searchQuery.trim()) {
+      dispatch(getAllProducts());
+    } else {
+      dispatch(searchProduct({ searchTerm: searchQuery}));
+ 
+    }
   };
   return (
     <nav className="bg-white shadow-md">
@@ -38,8 +53,14 @@ export default function Navbar() {
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                // onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e)=>setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(searchQuery);
+                  }
+                }}
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>

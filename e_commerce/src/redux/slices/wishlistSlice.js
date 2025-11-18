@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addToWishlist,getWishlist,removeWishlistItem } from "../thunk/wishlistThunk";
+import { addToWishlist,getWishlist } from "../thunk/wishlistThunk";
 
 const initialState = {
   wishlist: {},
@@ -34,18 +34,18 @@ export const wishlistSlice = createSlice({
       })
       .addCase(getWishlist.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
-      })
-    //   remove wishlist
-    .addCase(removeWishlistItem.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(removeWishlistItem.fulfilled, (state, action) => {
-        state.status = "succeded";
-        state.wishlist = action.payload.wishlist;
-      })
-      .addCase(removeWishlistItem.rejected, (state, action) => {
-        (state.status = "failed"), (state.error = action.payload);
       });
+    //   remove wishlist
+    // .addCase(removeWishlistItem.pending, (state) => {
+    //     state.status = "loading";
+    //   })
+    //   .addCase(removeWishlistItem.fulfilled, (state, action) => {
+    //     state.status = "succeded";
+    //     state.wishlist = action.payload.wishlist;
+    //   })
+    //   .addCase(removeWishlistItem.rejected, (state, action) => {
+    //     (state.status = "failed"), (state.error = action.payload);
+    //   });
   },
   
 });

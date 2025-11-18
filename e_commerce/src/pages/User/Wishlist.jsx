@@ -1,15 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useEffect ,useState} from "react";
 import { useSelector } from "react-redux";
 import { ShoppingBag } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { getWishlist } from "../../redux/thunk/wishlistThunk";
+import { addToCart } from "../../redux/thunk/cartThunk";
 export default function Wishlist() {
   const dispatch = useDispatch();
-const wishlist = useSelector((state)=>state.wishlist.wishlist);
-console.log("wishlist from redux ",wishlist)
-useEffect(()=>{
-  dispatch(getWishlist())
-},[dispatch])
+  const wishlist = useSelector((state) => state.wishlist.wishlist);
+  const user = useSelector((state) => state.user.user);
+  const [messages, setMessages] = useState({});
+  console.log("wishlist from redux ", wishlist);
+  useEffect(() => {
+    dispatch(getWishlist());
+  }, [dispatch]);
+  const handleAddToCart = (id, stock) => {
+    console.log("stock ",stock);
+    if (user) {
+      if (stock > 0) {
+        dispatch(addToCart({ productId: id, quantity: 1 }));
+        setMessages((prev) => ({ ...prev, [id]: "" }));
+      } else {
+        setMessages((prev) => ({ ...prev, [id]: "Product is out of stock" }));
+      }
+    } else {
+      navigator("/user/login");
+    }
+  };
+console.log("wishlist items",wishlist.items)
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="p-6 border-b">
@@ -31,11 +48,17 @@ useEffect(()=>{
               <p className="text-lg font-bold text-indigo-600 mb-3">
                 ${item.price}
               </p>
-              <button className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+              <button
+                className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+                onClick={() => handleAddToCart(item.productId._id, item.productId.stock)}
+              >
                 <ShoppingBag className="w-4 h-4" />
                 Add to Cart
               </button>
             </div>
+            {messages[item.productId._id] && (
+              <p className="text-red-900">{messages[item.productId._id]}</p>
+            )}
           </div>
         ))}
       </div>

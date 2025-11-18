@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllProducts ,getProductById} from "../thunk/productThunk";
+import {
+  getAllProducts,
+  getProductById,
+  searchProduct,
+  filterProductByCategory,
+} from "../thunk/productThunk";
 
 const initialState = {
   allProducts: [],
@@ -34,7 +39,32 @@ export const productSlice = createSlice({
       })
       .addCase(getProductById.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
+      })
+      // search prdouct
+
+      .addCase(searchProduct.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(searchProduct.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.allProducts = action.payload;
+      })
+      .addCase(searchProduct.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      })
+      // filter
+      .addCase(filterProductByCategory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(filterProductByCategory.fulfilled, (state, action) => {
+        state.status = "succeded";
+        console.log("action.payload",action.payload)
+        state.allProducts = action.payload;
+      })
+      .addCase(filterProductByCategory.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
       });
   },
 });
+export const { setSearchQuery, setSelectedCategory } = productSlice.actions;
 export default productSlice.reducer;

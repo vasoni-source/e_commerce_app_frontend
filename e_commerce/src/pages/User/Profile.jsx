@@ -166,7 +166,7 @@ export default function Profile() {
                   <Package className="w-5 h-5" />
                   <span className="font-medium">My Orders</span>
                 </button>
-                <button
+                {/* <button
                   onClick={() => setActiveTab("wishlist")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     activeTab === "wishlist"
@@ -176,7 +176,7 @@ export default function Profile() {
                 >
                   <Heart className="w-5 h-5" />
                   <span className="font-medium">Wishlist</span>
-                </button>
+                </button> */}
                 <button
                   onClick={() => setActiveTab("addresses")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
@@ -350,7 +350,7 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Wishlist Tab */}
+            {/* Wishlist Tab
             {activeTab === "wishlist" && (
               <div className="bg-white rounded-lg shadow">
                 <div className="p-6 border-b">
@@ -385,7 +385,7 @@ export default function Profile() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Addresses Tab */}
             {activeTab === "addresses" && (
