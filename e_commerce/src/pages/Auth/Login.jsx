@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginWithPassword } from "../../redux/thunk/authThunk";
 import { useNavigate } from "react-router-dom";
-import { forgotPassword,resetPassword } from "../../redux/thunk/authThunk";
+import { forgotPassword, resetPassword } from "../../redux/thunk/authThunk";
 export default function Login() {
   const dispatch = useDispatch();
   const navigator = useNavigate();
@@ -11,13 +11,20 @@ export default function Login() {
   console.log("user from login", user);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [openOtpField,setOpenOtpField] = useState(false)
+  const [openOtpField, setOpenOtpField] = useState(false);
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginWithPassword({ email, password }));
-    navigator("/")
   };
+  useEffect(() => {
+    if (!user) return; // ignore until user is available
 
+    if (user.role === "user") {
+      navigator("/");
+    } else {
+      navigator("/seller_dashboard");
+    }
+  }, [user]);
 
   // Forgot password UI states
   const [showForgot, setShowForgot] = useState(false);
@@ -32,7 +39,9 @@ export default function Login() {
     const res = await dispatch(forgotPassword(forgotEmail));
 
     if (res.meta.requestStatus === "fulfilled") {
-      alert("Reset token sent to email (check backend console). Enter token below.");
+      alert(
+        "Reset token sent to email (check backend console). Enter token below."
+      );
       setShowResetForm(true);
     }
   };
@@ -98,12 +107,12 @@ export default function Login() {
                 >
                   Forgot password?
                 </a> */}
-                 <p
-            onClick={() => setShowForgot(true)}
-            className="text-indigo-400 text-sm cursor-pointer underline text-right"
-          >
-            Forgot password?
-          </p>
+                <p
+                  onClick={() => setShowForgot(true)}
+                  className="text-indigo-400 text-sm cursor-pointer underline text-right"
+                >
+                  Forgot password?
+                </p>
               </div>
             </div>
             <div className="mt-2">
@@ -144,7 +153,6 @@ export default function Login() {
       {showForgot && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center">
           <div className="bg-white p-6 rounded w-96 shadow-lg">
-
             {!showResetForm ? (
               <>
                 <h2 className="text-xl font-bold mb-3">Forgot Password</h2>
@@ -167,7 +175,6 @@ export default function Login() {
                 <h2 className="text-xl font-bold mb-3">Reset Password</h2>
 
                 <form onSubmit={handleResetPassword}>
-
                   <input
                     type="text"
                     placeholder="Enter token from email"
