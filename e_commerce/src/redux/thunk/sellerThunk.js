@@ -119,7 +119,7 @@ export const updateProduct = createAsyncThunk(
       formData.append("brand", product.brand);
       formData.append("description", product.description);
       formData.append("image", product.image); 
-      const res = await axios.put(
+      const res = await axios.patch(
         `http://localhost:5000/product/${product._id}`,formData,
         {
           headers: {
@@ -135,6 +135,32 @@ export const updateProduct = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           "Failed to update product Please try again."
+      );
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  "delete_product",
+  async (id, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      const res = await axios.delete(
+        `http://localhost:5000/product/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("products", res.data);
+      return res.data;
+    } catch (error) {
+      console.log("error", error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to delete product Please try again."
       );
     }
   }

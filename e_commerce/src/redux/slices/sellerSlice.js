@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { sellerRevenue ,orderPerSeller,productPerSeller,createProduct,updateProduct} from "../thunk/sellerThunk";
+import { sellerRevenue ,orderPerSeller,productPerSeller,createProduct,updateProduct,deleteProduct} from "../thunk/sellerThunk";
 
 const initialState = {
   revenue: null,
@@ -68,11 +68,24 @@ const initialState = {
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.status = "succeded";
-        state.singleProduct = action.payload;
+        state.singleProduct = action.payload.updatedProduct;
+        state.products = action.payload.products;
       })
       .addCase(updateProduct.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
-      });
+      })
+
+      // delete product
+     .addCase(deleteProduct.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(deleteProduct.fulfilled, (state, action) => {
+      state.status = "succeded";
+      state.products = action.payload;
+    })
+    .addCase(deleteProduct.rejected, (state, action) => {
+      (state.status = "failed"), (state.error = action.payload);
+    });
   
   },
 });

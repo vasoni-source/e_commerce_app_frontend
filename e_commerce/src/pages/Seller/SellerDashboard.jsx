@@ -13,6 +13,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   createProduct,
+  deleteProduct,
   productPerSeller,
   sellerRevenue,
   updateProduct,
@@ -20,44 +21,6 @@ import {
 import { orderPerSeller } from "../../redux/thunk/sellerThunk";
 export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      price: 79.99,
-      stock: 45,
-      category: "Electronics",
-      image: "🎧",
-      sales: 128,
-    },
-    {
-      id: 2,
-      name: "Smart Watch",
-      price: 199.99,
-      stock: 23,
-      category: "Electronics",
-      image: "⌚",
-      sales: 87,
-    },
-    {
-      id: 3,
-      name: "Laptop Stand",
-      price: 34.99,
-      stock: 67,
-      category: "Accessories",
-      image: "💻",
-      sales: 156,
-    },
-    {
-      id: 4,
-      name: "USB-C Cable",
-      price: 12.99,
-      stock: 120,
-      category: "Accessories",
-      image: "🔌",
-      sales: 243,
-    },
-  ]);
   const categories = [
     "Mobile",
     "Electronics",
@@ -152,7 +115,7 @@ export default function SellerDashboard() {
       price: "",
       stock: "",
       category: "",
-      image: "📦",
+      image: "",
     });
     setShowModal(true);
   };
@@ -186,15 +149,16 @@ export default function SellerDashboard() {
 
   const handleDeleteProduct = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter((p) => p.id !== id));
+      // setProducts(products.filter((p) => p.id !== id));
+      dispatch(deleteProduct(id));
     }
   };
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredProducts = products.filter(
+  //   (p) =>
+  //     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     p.category.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -454,13 +418,14 @@ export default function SellerDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {allProducts.map((product) => (
                 <div
-                  key={product.id}
+                  key={product._id}
                   className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       {/* <div className="text-5xl">{product.image}</div> */}
-                      <img src={product.imageUrl} alt="" />
+                      {/* <img src={product.imageUrl} alt="" /> */}
+                      <div><img src={product.imageUrl} alt="" /></div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEditModal(product)}
@@ -469,7 +434,7 @@ export default function SellerDashboard() {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteProduct(product.id)}
+                          onClick={() => handleDeleteProduct(product._id)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -538,22 +503,27 @@ export default function SellerDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
+                  {allOrdersPerSeller.map((order) => (
+                    <tr key={order._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        #{order.id}
+                        #{order._id}
+                      </td>
+                      {order.orderItems.map((item) => (
+                          <td
+                            className="px-6 py-4 text-sm text-gray-600 flex flex-col"
+                            key={item._id}
+                          >
+                            {item.product.name}
+                          </td>
+                        ))}
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {order.user.name}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {order.product}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {order.customer}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {order.date}
+                        {order.createdAt}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        ${order.amount}
+                        ${order.totalAmount}
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -564,6 +534,7 @@ export default function SellerDashboard() {
                           {order.status}
                         </span>
                       </td>
+                      <td><span><Edit2 className="w-4 h-4" /></span></td>
                     </tr>
                   ))}
                 </tbody>
