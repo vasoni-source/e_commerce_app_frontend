@@ -19,10 +19,13 @@ export default function Login() {
   useEffect(() => {
     if (!user) return; // ignore until user is available
 
-    if (user.role === "user") {
-      navigator("/");
-    } else {
+    if (user.role === "admin") {
+      navigator("/admin_dashboard");
+    } else if(user.role ==="seller"){
       navigator("/seller_dashboard");
+    }
+    else{
+      navigator("/")
     }
   }, [user]);
 

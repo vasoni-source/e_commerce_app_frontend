@@ -49,6 +49,30 @@ export const orderPerSeller = createAsyncThunk(
     }
   }
 );
+export const updateOrderField = createAsyncThunk(
+  "update_order",
+  async ({orderId,status}, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.patch(
+        `http://localhost:5000/order/${orderId}`,{status},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    //   console.log("orders", res.data);
+      return res.data;
+    } catch (error) {
+      console.log("error", error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to update order Please try again."
+      );
+    }
+  }
+);
 export const productPerSeller = createAsyncThunk(
   "seller_products",
   async (_, { rejectWithValue }) => {

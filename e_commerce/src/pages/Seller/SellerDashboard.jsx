@@ -9,16 +9,22 @@ import {
   TrendingUp,
   Search,
   X,
+    LogOut,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import {
   createProduct,
   deleteProduct,
   productPerSeller,
   sellerRevenue,
+  updateOrderField,
   updateProduct,
 } from "../../redux/thunk/sellerThunk";
 import { orderPerSeller } from "../../redux/thunk/sellerThunk";
+import updateUserField from "../../redux/thunk/userThunk";
+import { logOut } from "../../redux/slices/authSlice";
 export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const categories = [
@@ -86,25 +92,33 @@ export default function SellerDashboard() {
   const [modalMode, setModalMode] = useState("create");
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const navigator = useNavigate();
   const totalRevenue = orders.reduce((sum, order) => sum + order.amount, 0);
   const dispatch = useDispatch();
   const totalRevenueCount = useSelector((state) => state.seller.revenue);
+  const averageOrderValue = useSelector(
+    (state) => state.seller.averageOrderValue
+  );
+
   const totalOrders = orders.length;
   const allOrdersPerSeller = useSelector((state) => state.seller.orders.orders);
   console.log("all orders per seller", allOrdersPerSeller);
   const totalOrderCount = useSelector((state) => state.seller.orders.count);
   const allProducts = useSelector((state) => state.seller.products);
+  const user = useSelector((state) => state.user.user);
   console.log("all products by seller", allProducts);
   //   const totalProducts = products.length;
   const totalProducts = allProducts.length;
   const avgOrderValue = totalRevenue / totalOrders;
+  const updatedOrderFlag = useSelector(
+    (state) => state.seller.updatedOrderFlag
+  );
   useEffect(() => {
     console.log("inside useEffect");
     dispatch(sellerRevenue());
     dispatch(orderPerSeller());
     dispatch(productPerSeller());
-  }, [dispatch]);
+  }, [dispatch, updatedOrderFlag]);
   const sortedOrders = (allOrdersPerSeller || [])
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -125,7 +139,7 @@ export default function SellerDashboard() {
     setEditingProduct({ ...product });
     setShowModal(true);
   };
-
+  const [openStatusFieldId, setOpenStatusFieldId] = useState(null);
   const handleSaveProduct = () => {
     if (modalMode === "create") {
       const newProduct = {
@@ -138,8 +152,8 @@ export default function SellerDashboard() {
       setProducts([...products, newProduct]);
       dispatch(createProduct(newProduct));
     } else {
-        console.log("editing product",editingProduct)
-        dispatch(updateProduct(editingProduct))
+      console.log("editing product", editingProduct);
+      dispatch(updateProduct(editingProduct));
       setProducts(
         products.map((p) => (p.id === editingProduct.id ? editingProduct : p))
       );
@@ -159,18 +173,71 @@ export default function SellerDashboard() {
   //     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   // );
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  // Function to handle status change
+
+  const handleStatusChange = (orderId) => {
+    if (!selectedStatus) {
+      alert("Please select a status");
+      return;
+    }
+
+    // Dispatch your thunk API function
+    console.log("order id from page", orderId);
+    dispatch(
+      updateOrderField({
+        orderId: orderId,
+        status: selectedStatus,
+      })
+    );
+
+    // Close the dropdown and reset
+    setOpenStatusFieldId(null);
+    setSelectedStatus("");
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Delivered":
+      case "delivered":
         return "bg-green-100 text-green-800";
       case "Shipped":
         return "bg-blue-100 text-blue-800";
-      case "Processing":
+      case "processing":
         return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+  const [name, setName] = useState(user?.name || "");
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
+  console.log("user from seller dashboard", user);
+  // Shipping address state
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country, setCountry] = useState("");
+  const handleSave = () => {
+    const updatedData = {
+      name,
+      phoneNumber,
+      shippingAddresses: {
+        address,
+        city,
+        postalCode,
+        country,
+      },
+    };
+
+    dispatch(updateUserField(updatedData));
+  };
+  const handleLogOut = () => {
+    dispatch(logOut());
+    Cookies.remove("user");
+    Cookies.remove("token");
+    navigator("/");
   };
 
   return (
@@ -189,7 +256,7 @@ export default function SellerDashboard() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                S
+                {user?.name[0]}
               </div>
             </div>
           </div>
@@ -240,7 +307,15 @@ export default function SellerDashboard() {
             >
               Profile
             </button>
+            <button
+            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+            onClick={handleLogOut}
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
           </div>
+          
         </div>
       </div>
 
@@ -263,11 +338,11 @@ export default function SellerDashboard() {
                     <DollarSign className="w-6 h-6 text-green-600" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm">
+                {/* <div className="mt-4 flex items-center text-sm">
                   <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
                   <span className="text-green-600 font-medium">+12.5%</span>
                   <span className="text-gray-600 ml-2">vs last month</span>
-                </div>
+                </div> */}
               </div>
 
               <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
@@ -282,11 +357,11 @@ export default function SellerDashboard() {
                     <ShoppingBag className="w-6 h-6 text-blue-600" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm">
+                {/* <div className="mt-4 flex items-center text-sm">
                   <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
                   <span className="text-green-600 font-medium">+8.2%</span>
                   <span className="text-gray-600 ml-2">vs last month</span>
-                </div>
+                </div> */}
               </div>
 
               <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
@@ -311,18 +386,18 @@ export default function SellerDashboard() {
                   <div>
                     <p className="text-sm text-gray-600">Avg Order Value</p>
                     <p className="text-2xl font-bold text-gray-900 mt-1">
-                      ${avgOrderValue.toFixed(2)}
+                      ${averageOrderValue?.toFixed(2)}
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                     <TrendingUp className="w-6 h-6 text-orange-600" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm">
+                {/* <div className="mt-4 flex items-center text-sm">
                   <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
                   <span className="text-green-600 font-medium">+5.1%</span>
                   <span className="text-gray-600 ml-2">vs last month</span>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -425,7 +500,9 @@ export default function SellerDashboard() {
                     <div className="flex items-start justify-between mb-4">
                       {/* <div className="text-5xl">{product.image}</div> */}
                       {/* <img src={product.imageUrl} alt="" /> */}
-                      <div><img src={product.imageUrl} alt="" /></div>
+                      <div>
+                        <img src={product.imageUrl} alt="" />
+                      </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEditModal(product)}
@@ -509,13 +586,13 @@ export default function SellerDashboard() {
                         #{order._id}
                       </td>
                       {order.orderItems.map((item) => (
-                          <td
-                            className="px-6 py-4 text-sm text-gray-600 flex flex-col"
-                            key={item._id}
-                          >
-                            {item.product.name}
-                          </td>
-                        ))}
+                        <td
+                          className="px-6 py-4 text-sm text-gray-600 flex flex-col"
+                          key={item._id}
+                        >
+                          {item.product.name}
+                        </td>
+                      ))}
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {order.user.name}
                       </td>
@@ -534,7 +611,37 @@ export default function SellerDashboard() {
                           {order.status}
                         </span>
                       </td>
-                      <td><span><Edit2 className="w-4 h-4" /></span></td>
+                      <td>
+                        {openStatusFieldId !== order._id ? (
+                          <span>
+                            <Edit2
+                              className="w-4 h-4 cursor-pointer"
+                              onClick={() => setOpenStatusFieldId(order._id)}
+                            />
+                          </span>
+                        ) : (
+                          <div>
+                            <select
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              value={selectedStatus}
+                              onChange={(e) =>
+                                setSelectedStatus(e.target.value)
+                              }
+                            >
+                              <option value="">Select status</option>
+                              <option value="pending">Pending</option>
+                              <option value="processing">Processing</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                            <button
+                              onClick={() => handleStatusChange(order._id)}
+                            >
+                              change status
+                            </button>
+                          </div>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -549,59 +656,133 @@ export default function SellerDashboard() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center gap-6 mb-6">
                 <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                  S
+                  {user.name[0]}
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
-                    Seller Account
+                    {user.name}
                   </h2>
-                  <p className="text-gray-600">seller@example.com</p>
+                  <p className="text-gray-600">{user.email}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Store Name
+                    Name
                   </label>
                   <input
                     type="text"
-                    defaultValue="My Awesome Store"
+                    // defaultValue={user.name}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    defaultValue="seller@example.com"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Phone
                   </label>
                   <input
                     type="tel"
-                    defaultValue="+1 234 567 8900"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Business Address
-                  </label>
-                  <textarea
-                    rows="3"
-                    defaultValue="123 Business St, Commerce City, CC 12345"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
+                {/* <div>
+                  {
+                    user?.shippingAddresses.map((address)=>(
+                      <div>{`${address.address} ${address.city} ${address.postalCode} ${address.country}`}</div>
+                    ))
+                  }
+                </div> */}
+                <div className="border-t border-gray-200 mt-8 pt-6">
+                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                    Add New Address
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label
+                        htmlFor="address"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Street Address
+                      </label>
+                      <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        placeholder="123 Main St"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="city"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          id="city"
+                          name="city"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          placeholder="New York"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="postalCode"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Postal Code
+                        </label>
+                        <input
+                          type="text"
+                          id="postalCode"
+                          name="postalCode"
+                          value={postalCode}
+                          onChange={(e) => setPostalCode(e.target.value)}
+                          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          placeholder="10001"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="country"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        id="country"
+                        name="country"
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        placeholder="United States"
+                      />
+                    </div>
+                  </div>
                 </div>
                 <div className="pt-4">
-                  <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
+                  <button
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors"
+                    onClick={handleSave}
+                  >
                     Save Changes
                   </button>
                 </div>
@@ -717,7 +898,7 @@ export default function SellerDashboard() {
                   placeholder="0"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category

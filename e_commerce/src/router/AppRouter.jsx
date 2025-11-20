@@ -9,6 +9,7 @@ import Profile from "../pages/User/Profile";
 import ProductDetail from "../pages/Home/ProductDetail";
 import Wishlist from "../pages/User/Wishlist";
 import SellerDashboard from "../pages/Seller/SellerDashboard";
+import AdminDashboard from "../pages/Admin/AdminDashboard";
 export default function AppRouter() {
   return (
     <Routes>
@@ -23,6 +24,8 @@ export default function AppRouter() {
 
       {/* seller-Routes */}
       <Route path="/seller_dashboard" element={<SellerDashboard />} />
+      <Route path="/admin_dashboard" element={<AdminDashboard />} />
+
 
     </Routes>
   );
