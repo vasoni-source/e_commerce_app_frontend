@@ -10,25 +10,54 @@ import {
   Eye,
 } from "lucide-react";
 import { useSelector,useDispatch } from "react-redux";
-import { getAllOrders, getAllProductsWithoutPagination, getAllUsers } from "../../redux/thunk/adminThunk";
+import { getAllOrders, getAllOrdersByUser, getAllProductsWithoutPagination, getAllSellersStats, getAllUsers } from "../../redux/thunk/adminThunk";
+import { deleteProduct } from "../../redux/thunk/sellerThunk";
+import { logOut } from "../../redux/slices/authSlice";
+import { LogOut } from "lucide-react";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const dispatch = useDispatch();
+  const navigator = useNavigate();
   const products = useSelector((state)=>state.admin.products);
   const productsCount = products.length;
   const orders = useSelector((state)=>state.admin.orders);
+  const pendingOrder = orders.filter((order)=>order.status==="Pending")
+  const pendingOrderCount = pendingOrder.length
   const totalRevenue = useSelector((state)=>state.admin.totalRevenue);
-  const users = useSelector((state)=>state.admin.users)
+  const users = useSelector((state)=>state.admin.users);
+  const userOrder = useSelector((state)=>state.admin.userOrder);
+  const sellerStats = useSelector((state)=>state.admin.sellersStats)
+  console.log("sellers stats",sellerStats);
+  // const userOrderCount = userOrder.length;
   console.log("orders fromm admin page",orders)
   useEffect(()=>{
     dispatch(getAllProductsWithoutPagination());
     dispatch(getAllOrders());
     dispatch(getAllUsers());
+    dispatch(getAllOrdersByUser())
+    dispatch(getAllSellersStats())
   },[dispatch])
    const sortedOrders = (orders || [])
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     console.log("sorted orders",sortedOrders)
+
+    const getStatusColor = (status) => {
+      switch (status) {
+        case "delivered":
+          return "bg-green-100 text-green-800";
+        case "Shipped":
+          return "bg-blue-100 text-blue-800";
+        case "processing":
+          return "bg-yellow-100 text-yellow-800";
+        case "cancelled":
+          return "bg-red-100 text-red-800";
+        default:
+          return "bg-gray-100 text-gray-800";
+      }
+    };
   // Sample data
 //   const [products, setProducts] = useState([
 //     {
@@ -148,7 +177,12 @@ export default function AdminDashboard() {
 //       joined: "2024-04-22",
 //     },
 //   ];
-
+const handleLogOut = () => {
+  dispatch(logOut());
+  Cookies.remove("user");
+  Cookies.remove("token");
+  navigator("/");
+};
   const sellers = [
     {
       id: 1,
@@ -192,30 +226,38 @@ export default function AdminDashboard() {
 //   };
 
   const handleDeleteProduct = (id) => {
-    setProducts(products.filter((p) => p.id !== id));
+    // setProducts(products.filter((p) => p.id !== id));
+    dispatch(deleteProduct(id));
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Delivered":
-        return "bg-green-100 text-green-800";
-      case "Shipped":
-        return "bg-blue-100 text-blue-800";
-      case "Processing":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  // const getStatusColor = (status) => {
+  //   switch (status) {
+  //     case "Delivered":
+  //       return "bg-green-100 text-green-800";
+  //     case "Shipped":
+  //       return "bg-blue-100 text-blue-800";
+  //     case "Processing":
+  //       return "bg-yellow-100 text-yellow-800";
+  //     default:
+  //       return "bg-gray-100 text-gray-800";
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        </div>
-      </header>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+    <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+    <button
+      className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+      onClick={handleLogOut}
+    >
+      <LogOut className="w-5 h-5" />
+      <span>Logout</span>
+    </button>
+  </div>
+</header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
@@ -351,8 +393,7 @@ export default function AdminDashboard() {
                         <span className="text-gray-600">Pending Orders</span>
                         <span className="font-semibold text-gray-900">
                           {
-                            orders.filter((o) => o.status === "Processing")
-                              .length
+                            pendingOrderCount
                           }
                         </span>
                       </div>
@@ -419,9 +460,9 @@ export default function AdminDashboard() {
                   <h2 className="text-xl font-semibold text-gray-900">
                     All Products
                   </h2>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                  {/* <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                     Add Product
-                  </button>
+                  </button> */}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -463,13 +504,13 @@ export default function AdminDashboard() {
                             {product.category}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {product.seller}
+                            {product.seller.name}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <div className="flex space-x-2">
-                              <button className="text-blue-600 hover:text-blue-800">
+                              {/* <button className="text-blue-600 hover:text-blue-800">
                                 <Eye className="w-5 h-5" />
-                              </button>
+                              </button> */}
                               <button
                                 onClick={() => handleDeleteProduct(product._id)}
                                 className="text-red-600 hover:text-red-800"
@@ -511,22 +552,22 @@ export default function AdminDashboard() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Actions
-                        </th>
+                        </th> */}
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {orders.map((order) => (
-                        <tr key={order.id}>
+                        <tr key={order._id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {order.id}
+                            {order._id}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {order.customer}
+                            {order.user.name}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${order.total}
+                            ${order.totalAmount}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
@@ -538,13 +579,13 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {order.date}
+                            {order.createdAt}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <button className="text-blue-600 hover:text-blue-800">
                               <Eye className="w-5 h-5" />
                             </button>
-                          </td>
+                          </td> */}
                         </tr>
                       ))}
                     </tbody>
@@ -572,16 +613,16 @@ export default function AdminDashboard() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Orders
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Joined
-                        </th>
+                        </th> */}
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Actions
+                          Total Purchase
                         </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {users.map((user) => (
+                      {userOrder.map((user) => (
                         <tr key={user.id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {user.name}
@@ -590,16 +631,20 @@ export default function AdminDashboard() {
                             {user.email}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {user.orders}
+                            {user.orderCount}
                           </td>
+                         
+                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {user.createdAt}
+                          </td> */}
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {user.joined}
+                            {user.totalOrderAmount}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <button className="text-blue-600 hover:text-blue-800">
                               <Eye className="w-5 h-5" />
                             </button>
-                          </td>
+                          </td> */}
                         </tr>
                       ))}
                     </tbody>
@@ -615,9 +660,9 @@ export default function AdminDashboard() {
                   All Sellers
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {sellers.map((seller) => (
+                  {sellerStats.map((seller) => (
                     <div
-                      key={seller.id}
+                      key={seller._id}
                       className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 border border-gray-200"
                     >
                       <div className="flex items-start justify-between mb-4">
@@ -625,9 +670,9 @@ export default function AdminDashboard() {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {seller.name}
                           </h3>
-                          <p className="text-sm text-gray-500">
+                          {/* <p className="text-sm text-gray-500">
                             Joined {seller.joined}
-                          </p>
+                          </p> */}
                         </div>
                         <Store className="w-8 h-8 text-blue-500" />
                       </div>
@@ -644,16 +689,14 @@ export default function AdminDashboard() {
                             ${seller.revenue.toLocaleString()}
                           </span>
                         </div>
-                        <div className="flex justify-between">
+                        {/* <div className="flex justify-between">
                           <span className="text-gray-600">Rating</span>
                           <span className="font-semibold text-gray-900">
                             {seller.rating} ⭐
                           </span>
-                        </div>
+                        </div> */}
                       </div>
-                      <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                        View Details
-                      </button>
+                     
                     </div>
                   ))}
                 </div>

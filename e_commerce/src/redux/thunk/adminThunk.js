@@ -33,3 +33,36 @@ export const getAllUsers = createAsyncThunk("all_users", async () => {
     console.log("error", error);
   }
 });
+
+export const getAllOrdersByUser = createAsyncThunk("all_usersOrders", async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get("http://localhost:5000/analytics/orders_per_user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("response from api ", res.data);
+
+    return res.data;
+  } catch (error) {
+    console.log("error", error);
+  }
+});
+export const getAllSellersStats = createAsyncThunk("sellers_stats", async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get("http://localhost:5000/analytics/sellers_stats", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("response from api ", res.data);
+
+    return res.data;
+  } catch (error) {
+    console.log("error", error);
+  }
+});

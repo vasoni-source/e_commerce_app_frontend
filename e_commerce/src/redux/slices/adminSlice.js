@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllProductsWithoutPagination,getAllOrders,getAllUsers } from "../thunk/adminThunk";
-
+import { getAllProductsWithoutPagination,getAllOrders,getAllUsers,getAllOrdersByUser,getAllSellersStats } from "../thunk/adminThunk";
+import { deleteProduct } from "../thunk/sellerThunk";
 const initialState = {
   revenue: null,
   users:[],
   orders: [],
   orderCount:0,
+  userOrder:[],
+  sellersStats:[],
   totalRevenue:0,
   averageOrderAmount:0,
   products: [],
@@ -54,6 +56,41 @@ export const sellerSlice = createSlice({
       .addCase(getAllUsers.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
       })
+
+      // delete product
+      .addCase(deleteProduct.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.products = action.payload;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      })
+      // get orders by userId
+      .addCase(getAllOrdersByUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getAllOrdersByUser.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.userOrder = action.payload;
+      })
+      .addCase(getAllOrdersByUser.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      })
+
+      // get sellers stats
+      .addCase(getAllSellersStats.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getAllSellersStats.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.sellersStats = action.payload;
+      })
+      .addCase(getAllSellersStats.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      });
 
   },
 });
