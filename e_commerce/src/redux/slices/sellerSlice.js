@@ -96,7 +96,7 @@ export const sellerSlice = createSlice({
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.status = "succeded";
         state.singleProduct = action.payload.updatedProduct;
-        state.products = action.payload.products;
+        // state.products = action.payload.products;
       })
       .addCase(updateProduct.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);

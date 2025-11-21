@@ -1,5 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+export const createAcountByAdmin = createAsyncThunk("create_acount", async (data) => {
+  try {
+    const res = await axios.post("http://localhost:5000/user/registerByAdmin",data);
+
+    console.log("response from api ", res.data);
+
+    return res.data;
+  } catch (error) {
+    console.log("error", error);
+  }
+});
 export const getAllProductsWithoutPagination = createAsyncThunk("all_product", async () => {
   try {
     const res = await axios.get("http://localhost:5000/analytics/all/products");

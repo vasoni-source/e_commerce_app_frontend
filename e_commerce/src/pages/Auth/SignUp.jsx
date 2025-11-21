@@ -17,6 +17,13 @@ export default function SignUp() {
     password: "",
     otp: "",
   });
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+
   const sendOtp = async (e) => {
     e.preventDefault();
     console.log("email", form.email);
@@ -27,25 +34,67 @@ export default function SignUp() {
     setMessage("");
     try {
       console.log("inside try");
-     const res = await axios.post("http://localhost:5000/user/register/send-otp",{email});
+      const res = await axios.post(
+        "http://localhost:5000/user/register/send-otp",
+        { email }
+      );
       console.log("response", res);
       setMessage(res.data.message);
       setOpenOtpField(true);
       setOtpSent(true);
       // navigator("/user/register")
     } catch (error) {
-      setMessage(error.response?.data?.error || "Failed to send OTP");
+      // setMessage(error.response?.data?.error || "Failed to send OTP");
+      setMessage(
+    error.response?.data?.message || 
+    error.response?.data?.error || 
+    "Failed to send OTP"
+  );
     }
   };
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-  const handleSubmit=(e)=>{
+  const validateForm = () => {
+    let newErrors = {};
+
+    // Name validation
+    if (!form.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (form.name.length < 3) {
+      newErrors.name = "Name must be at least 3 characters";
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(form.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    // Password validation
+    if (!form.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (form.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+
+    // return true if no errors
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("formdata from signup page",form);
-    dispatch(signUp(form))
-    setOpenOtpField(false)
-  }
+    console.log("formdata from signup page", form);
+    if (!validateForm()) {
+      return; // stop submit
+    }
+    dispatch(signUp(form));
+    setOpenOtpField(false);
+  };
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -76,6 +125,9 @@ export default function SignUp() {
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
             </div>
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm/6 font-medium text-black-100">
@@ -92,6 +144,9 @@ export default function SignUp() {
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
             </div>
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -111,6 +166,9 @@ export default function SignUp() {
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
             </div>
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password}</p>
+            )}
           </div>
           {openOtpField ? (
             <div>
@@ -136,18 +194,30 @@ export default function SignUp() {
             </div>
           ) : null}
 
-          <button
+          {/* <button
             className="flex w-6xs justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             onClick={(e)=>sendOtp(e)}
           >
             Generate Otp
+          </button> */}
+          <button
+            className={`flex w-6xs justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold 
+    ${
+      isEmailValid
+        ? "bg-indigo-500 hover:bg-indigo-400 text-white"
+        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+    }`}
+            onClick={(e) => sendOtp(e)}
+            disabled={!isEmailValid}
+          >
+            Generate Otp
           </button>
-          {message ? <p>{message}</p> : null}
+
+          {message ? <p className="text-red-600">{message}</p> : null}
           <div>
             <button
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              
             >
               Sign up
             </button>

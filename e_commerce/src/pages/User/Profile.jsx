@@ -22,7 +22,7 @@ import { cancelOrder, getOrders } from "../../redux/thunk/orderThunk";
 import updateUserField from "../../redux/thunk/userThunk";
 import { logOut } from "../../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("orders");
   const navigator = useNavigate();
@@ -31,9 +31,19 @@ export default function Profile() {
   const [openAddressInput, setOpenAddressInput] = useState(false);
   const [open, setOpen] = useState(false);
   const orders = useSelector((state) => state.order?.order);
+  const [name, setName] = useState(user?.name || "");
+  const [phone, setPhone] = useState(user?.phoneNumber || "");
   useEffect(() => {
     dispatch(getOrders());
   }, []);
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setPhone(user.phoneNumber);
+    }
+  }, [user]);
+  console.log("phone",phone)
+
   console.log("orders from profile", orders);
   console.log("user from profile page ", user);
   const handleCancelOrder = (orderId) => {
@@ -41,49 +51,7 @@ export default function Profile() {
     dispatch(cancelOrder(orderId));
     setOpen(false);
   };
-  // const user = {
-  //   name: 'Sarah Johnson',
-  //   email: 'sarah.johnson@example.com',
-  //   phone: '+1 (555) 123-4567',
-  //   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-  //   memberSince: 'January 2023',
-  //   loyaltyPoints: 1250
-  // };
 
-  // const orders = [
-  //   { id: '#ORD-2024-001', date: '2024-11-10', status: 'Delivered', total: '$156.99', items: 3 },
-  //   { id: '#ORD-2024-002', date: '2024-11-05', status: 'In Transit', total: '$89.50', items: 2 },
-  //   { id: '#ORD-2024-003', date: '2024-10-28', status: 'Delivered', total: '$234.00', items: 5 }
-  // ];
-
-  const wishlist = [
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      price: "$129.99",
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Smart Watch",
-      price: "$299.99",
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
-    },
-    {
-      id: 3,
-      name: "Running Shoes",
-      price: "$89.99",
-      image:
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop",
-    },
-  ];
-
-  // const addresses = [
-  //   { id: 1, type: 'Home', address: '123 Main St, Apt 4B', city: 'New York, NY 10001', default: true },
-  //   { id: 2, type: 'Work', address: '456 Business Ave, Suite 200', city: 'New York, NY 10002', default: false }
-  // ];
   const [shippingAddress, setShippingAddress] = useState({
     address: "",
     city: "",
@@ -112,6 +80,11 @@ export default function Profile() {
   const handleUpdateData = () => {
     dispatch(updateUserField(shippingAddress));
     setOpenAddressInput(false);
+  };
+  const handleSave = () => {
+    dispatch(updateUserField({ name, phoneNumber: phone  }));
+    Cookies.set('token', res.data.token, { expires: 0.5 });
+          Cookies.set('user', JSON.stringify(res.data.user), { expires: 0.5 });
   };
   const handleLogOut = () => {
     dispatch(logOut());
@@ -149,9 +122,6 @@ export default function Profile() {
                   {user?.name}
                 </h2>
                 <p className="text-sm text-gray-500">{user?.email}</p>
-                {/* <div className="mt-4 px-4 py-2 bg-indigo-50 rounded-full">
-                  <p className="text-sm font-medium text-indigo-700">{user.loyaltyPoints} Points</p>
-                </div> */}
               </div>
 
               <nav className="mt-8 space-y-2">
@@ -166,17 +136,7 @@ export default function Profile() {
                   <Package className="w-5 h-5" />
                   <span className="font-medium">My Orders</span>
                 </button>
-                {/* <button
-                  onClick={() => setActiveTab("wishlist")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                    activeTab === "wishlist"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <Heart className="w-5 h-5" />
-                  <span className="font-medium">Wishlist</span>
-                </button> */}
+
                 <button
                   onClick={() => setActiveTab("addresses")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
@@ -187,17 +147,6 @@ export default function Profile() {
                 >
                   <MapPin className="w-5 h-5" />
                   <span className="font-medium">Addresses</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("payment")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                    activeTab === "payment"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <CreditCard className="w-5 h-5" />
-                  <span className="font-medium">Payment Methods</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("settings")}
@@ -350,43 +299,6 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Wishlist Tab
-            {activeTab === "wishlist" && (
-              <div className="bg-white rounded-lg shadow">
-                <div className="p-6 border-b">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    My Wishlist
-                  </h3>
-                </div>
-                <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {wishlist.map((item) => (
-                    <div
-                      key={item.id}
-                      className="border rounded-lg overflow-hidden hover:shadow-lg transition"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="p-4">
-                        <h4 className="font-semibold text-gray-900 mb-2">
-                          {item.name}
-                        </h4>
-                        <p className="text-lg font-bold text-indigo-600 mb-3">
-                          {item.price}
-                        </p>
-                        <button className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center gap-2">
-                          <ShoppingBag className="w-4 h-4" />
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )} */}
-
             {/* Addresses Tab */}
             {activeTab === "addresses" && (
               <div className="bg-white rounded-lg shadow">
@@ -527,63 +439,6 @@ export default function Profile() {
                 </div>
               </div>
             )}
-
-            {/* Payment Methods Tab */}
-            {activeTab === "payment" && (
-              <div className="bg-white rounded-lg shadow">
-                <div className="p-6 border-b flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Payment Methods
-                  </h3>
-                  <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    + Add Card
-                  </button>
-                </div>
-                <div className="p-6 space-y-4">
-                  <div className="border rounded-lg p-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                    <div className="flex items-center justify-between mb-4">
-                      <CreditCard className="w-8 h-8" />
-                      <span className="text-sm font-medium">Default</span>
-                    </div>
-                    <p className="text-lg font-mono tracking-wider mb-4">
-                      •••• •••• •••• 4242
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs opacity-80">Card Holder</p>
-                        <p className="font-medium">SARAH JOHNSON</p>
-                      </div>
-                      <div>
-                        <p className="text-xs opacity-80">Expires</p>
-                        <p className="font-medium">12/26</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border rounded-lg p-4 hover:shadow-md transition">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <CreditCard className="w-6 h-6 text-gray-400" />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            •••• •••• •••• 8888
-                          </p>
-                          <p className="text-sm text-gray-600">Expires 08/27</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
-                          Edit
-                        </button>
-                        <button className="text-red-600 hover:text-red-700 text-sm font-medium">
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Settings Tab */}
             {activeTab === "settings" && (
               <div className="bg-white rounded-lg shadow">
@@ -599,11 +454,12 @@ export default function Profile() {
                     </label>
                     <input
                       type="text"
-                      value={user?.name}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address
                     </label>
@@ -612,55 +468,25 @@ export default function Profile() {
                       value={user?.email}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Phone Number
                     </label>
                     <input
                       type="tel"
-                      value={user?.phone}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
                   <div className="pt-4">
-                    <button className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
+                    <button
+                      className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                      onClick={handleSave}
+                    >
                       Save Changes
                     </button>
-                  </div>
-                  <div className="border-t pt-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
-                      Notifications
-                    </h4>
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="w-4 h-4 text-indigo-600 rounded"
-                        />
-                        <span className="text-gray-700">
-                          Email notifications for orders
-                        </span>
-                      </label>
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="w-4 h-4 text-indigo-600 rounded"
-                        />
-                        <span className="text-gray-700">
-                          Promotional emails
-                        </span>
-                      </label>
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 text-indigo-600 rounded"
-                        />
-                        <span className="text-gray-700">SMS notifications</span>
-                      </label>
-                    </div>
                   </div>
                 </div>
               </div>

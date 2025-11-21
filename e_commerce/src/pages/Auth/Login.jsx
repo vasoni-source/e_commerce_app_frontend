@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginWithPassword } from "../../redux/thunk/authThunk";
@@ -8,27 +8,36 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const user = useSelector((state) => state.user.user);
+  const error = useSelector((state)=>state.user.error);
   console.log("user from login", user);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [openOtpField, setOpenOtpField] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setEmailError("");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      return setEmailError("Email is required");
+    }
+    if (!emailRegex.test(email)) {
+      return setEmailError("Invalid email format");
+    }
     dispatch(loginWithPassword({ email, password }));
   };
   useEffect(() => {
-    if (!user) return; // ignore until user is available
+    if (!user) return;
 
     if (user.role === "admin") {
       navigator("/admin_dashboard");
-    } else if(user.role ==="seller"){
+    } else if (user.role === "seller") {
       navigator("/seller_dashboard");
-    }
-    else{
-      navigator("/")
+    } else {
+      navigator("/");
     }
   }, [user]);
-
   // Forgot password UI states
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -104,12 +113,6 @@ export default function Login() {
                 Password
               </label>
               <div className="text-sm">
-                {/* <a
-                  href="#"
-                  className="font-semibold text-indigo-400 hover:text-indigo-300"
-                >
-                  Forgot password?
-                </a> */}
                 <p
                   onClick={() => setShowForgot(true)}
                   className="text-indigo-400 text-sm cursor-pointer underline text-right"
@@ -141,7 +144,9 @@ export default function Login() {
             </button>
           </div>
         </form>
-
+{
+  error? <p className="text-red-600">{error}</p>:null
+}
         <p className="mt-10 text-center text-sm/6 text-gray-400">
           Not a have an acount?{" "}
           <Link
@@ -152,7 +157,6 @@ export default function Login() {
           </Link>
         </p>
       </div>
-      {/* FORGOT PASSWORD MODAL */}
       {showForgot && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center">
           <div className="bg-white p-6 rounded w-96 shadow-lg">

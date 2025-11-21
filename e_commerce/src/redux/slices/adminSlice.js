@@ -1,15 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllProductsWithoutPagination,getAllOrders,getAllUsers,getAllOrdersByUser,getAllSellersStats } from "../thunk/adminThunk";
+import {
+  getAllProductsWithoutPagination,
+  getAllOrders,
+  getAllUsers,
+  getAllOrdersByUser,
+  getAllSellersStats,
+  createAcountByAdmin,
+} from "../thunk/adminThunk";
 import { deleteProduct } from "../thunk/sellerThunk";
 const initialState = {
   revenue: null,
-  users:[],
+  newAcount: null,
+  users: [],
   orders: [],
-  orderCount:0,
-  userOrder:[],
-  sellersStats:[],
-  totalRevenue:0,
-  averageOrderAmount:0,
+  orderCount: 0,
+  userOrder: [],
+  sellersStats: [],
+  totalRevenue: 0,
+  averageOrderAmount: 0,
   products: [],
   status: null,
   error: null,
@@ -21,6 +29,18 @@ export const sellerSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+    // create acount by admin
+     .addCase(createAcountByAdmin.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(createAcountByAdmin.fulfilled, (state, action) => {
+        state.status = "succeded";
+        state.newAcount = action.payload;
+      })
+      .addCase(createAcountByAdmin.rejected, (state, action) => {
+        (state.status = "failed"), (state.error = action.payload);
+      })
+      // get all products without pagination
       .addCase(getAllProductsWithoutPagination.pending, (state) => {
         state.status = "loading";
       })
@@ -31,8 +51,8 @@ export const sellerSlice = createSlice({
       .addCase(getAllProductsWithoutPagination.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
       })
-    //   get all orders 
-     .addCase(getAllOrders.pending, (state) => {
+      //   get all orders
+      .addCase(getAllOrders.pending, (state) => {
         state.status = "loading";
       })
       .addCase(getAllOrders.fulfilled, (state, action) => {
@@ -45,8 +65,8 @@ export const sellerSlice = createSlice({
       .addCase(getAllOrders.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
       })
-    //   get all users customers
-    .addCase(getAllUsers.pending, (state) => {
+      //   get all users customers
+      .addCase(getAllUsers.pending, (state) => {
         state.status = "loading";
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
@@ -91,7 +111,6 @@ export const sellerSlice = createSlice({
       .addCase(getAllSellersStats.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
       });
-
   },
 });
 export default sellerSlice.reducer;

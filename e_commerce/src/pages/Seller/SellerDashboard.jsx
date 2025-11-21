@@ -9,7 +9,7 @@ import {
   TrendingUp,
   Search,
   X,
-    LogOut,
+  LogOut,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -117,8 +117,10 @@ export default function SellerDashboard() {
     console.log("inside useEffect");
     dispatch(sellerRevenue());
     dispatch(orderPerSeller());
-    dispatch(productPerSeller());
   }, [dispatch, updatedOrderFlag]);
+  useEffect(() => {
+    dispatch(productPerSeller());
+  }, [editingProduct]);
   const sortedOrders = (allOrdersPerSeller || [])
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -308,14 +310,13 @@ export default function SellerDashboard() {
               Profile
             </button>
             <button
-            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-            onClick={handleLogOut}
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </button>
+              className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+              onClick={handleLogOut}
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
           </div>
-          
         </div>
       </div>
 

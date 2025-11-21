@@ -40,7 +40,7 @@ export const loginWithPassword = createAsyncThunk(
     } catch (error) {
       console.log("error", error);
       return rejectWithValue(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.error || "Login failed. Please try again."
       );
     }
   }

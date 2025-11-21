@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Trash2,
   Package,
@@ -9,8 +9,15 @@ import {
   TrendingUp,
   Eye,
 } from "lucide-react";
-import { useSelector,useDispatch } from "react-redux";
-import { getAllOrders, getAllOrdersByUser, getAllProductsWithoutPagination, getAllSellersStats, getAllUsers } from "../../redux/thunk/adminThunk";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  createAcountByAdmin,
+  getAllOrders,
+  getAllOrdersByUser,
+  getAllProductsWithoutPagination,
+  getAllSellersStats,
+  getAllUsers,
+} from "../../redux/thunk/adminThunk";
 import { deleteProduct } from "../../redux/thunk/sellerThunk";
 import { logOut } from "../../redux/slices/authSlice";
 import { LogOut } from "lucide-react";
@@ -20,244 +27,91 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const dispatch = useDispatch();
   const navigator = useNavigate();
-  const products = useSelector((state)=>state.admin.products);
+  const user = useSelector((state)=>state.user.user);
+  const products = useSelector((state) => state.admin.products);
   const productsCount = products.length;
-  const orders = useSelector((state)=>state.admin.orders);
-  const pendingOrder = orders.filter((order)=>order.status==="Pending")
-  const pendingOrderCount = pendingOrder.length
-  const totalRevenue = useSelector((state)=>state.admin.totalRevenue);
-  const users = useSelector((state)=>state.admin.users);
-  const userOrder = useSelector((state)=>state.admin.userOrder);
-  const sellerStats = useSelector((state)=>state.admin.sellersStats)
-  console.log("sellers stats",sellerStats);
+  const orders = useSelector((state) => state.admin.orders);
+  const pendingOrder = orders.filter((order) => order.status === "Pending");
+  const pendingOrderCount = pendingOrder.length;
+  const totalRevenue = useSelector((state) => state.admin.totalRevenue);
+  const users = useSelector((state) => state.admin.users);
+  const userOrder = useSelector((state) => state.admin.userOrder);
+  const sellerStats = useSelector((state) => state.admin.sellersStats);
+  console.log("sellers stats", sellerStats);
   // const userOrderCount = userOrder.length;
-  console.log("orders fromm admin page",orders)
-  useEffect(()=>{
+  console.log("orders fromm admin page", orders);
+  useEffect(() => {
     dispatch(getAllProductsWithoutPagination());
     dispatch(getAllOrders());
     dispatch(getAllUsers());
-    dispatch(getAllOrdersByUser())
-    dispatch(getAllSellersStats())
-  },[dispatch])
-   const sortedOrders = (orders || [])
+    dispatch(getAllOrdersByUser());
+    dispatch(getAllSellersStats());
+  }, [dispatch]);
+  const sortedOrders = (orders || [])
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    console.log("sorted orders",sortedOrders)
+  console.log("sorted orders", sortedOrders);
 
-    const getStatusColor = (status) => {
-      switch (status) {
-        case "delivered":
-          return "bg-green-100 text-green-800";
-        case "Shipped":
-          return "bg-blue-100 text-blue-800";
-        case "processing":
-          return "bg-yellow-100 text-yellow-800";
-        case "cancelled":
-          return "bg-red-100 text-red-800";
-        default:
-          return "bg-gray-100 text-gray-800";
-      }
-    };
-  // Sample data
-//   const [products, setProducts] = useState([
-//     {
-//       id: 1,
-//       name: "Wireless Headphones",
-//       price: 99.99,
-//       stock: 45,
-//       category: "Electronics",
-//       seller: "TechStore",
-//     },
-//     {
-//       id: 2,
-//       name: "Running Shoes",
-//       price: 79.99,
-//       stock: 120,
-//       category: "Sports",
-//       seller: "SportsMart",
-//     },
-//     {
-//       id: 3,
-//       name: "Coffee Maker",
-//       price: 149.99,
-//       stock: 32,
-//       category: "Home",
-//       seller: "HomeGoods",
-//     },
-//     {
-//       id: 4,
-//       name: "Laptop Bag",
-//       price: 49.99,
-//       stock: 87,
-//       category: "Accessories",
-//       seller: "TechStore",
-//     },
-//     {
-//       id: 5,
-//       name: "Smart Watch",
-//       price: 299.99,
-//       stock: 23,
-//       category: "Electronics",
-//       seller: "GadgetHub",
-//     },
-//   ]);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "delivered":
+        return "bg-green-100 text-green-800";
+      case "Shipped":
+        return "bg-blue-100 text-blue-800";
+      case "processing":
+        return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
-//   const orders = [
-//     {
-//       id: "ORD-001",
-//       customer: "John Doe",
-//       total: 299.98,
-//       status: "Delivered",
-//       date: "2024-11-18",
-//     },
-//     {
-//       id: "ORD-002",
-//       customer: "Jane Smith",
-//       total: 149.99,
-//       status: "Shipped",
-//       date: "2024-11-19",
-//     },
-//     {
-//       id: "ORD-003",
-//       customer: "Bob Johnson",
-//       total: 79.99,
-//       status: "Processing",
-//       date: "2024-11-20",
-//     },
-//     {
-//       id: "ORD-004",
-//       customer: "Alice Brown",
-//       total: 429.97,
-//       status: "Delivered",
-//       date: "2024-11-17",
-//     },
-//     {
-//       id: "ORD-005",
-//       customer: "Charlie Wilson",
-//       total: 199.98,
-//       status: "Shipped",
-//       date: "2024-11-19",
-//     },
-//   ];
-
-//   const users = [
-//     {
-//       id: 1,
-//       name: "John Doe",
-//       email: "john@example.com",
-//       orders: 12,
-//       joined: "2024-01-15",
-//     },
-//     {
-//       id: 2,
-//       name: "Jane Smith",
-//       email: "jane@example.com",
-//       orders: 8,
-//       joined: "2024-02-20",
-//     },
-//     {
-//       id: 3,
-//       name: "Bob Johnson",
-//       email: "bob@example.com",
-//       orders: 5,
-//       joined: "2024-03-10",
-//     },
-//     {
-//       id: 4,
-//       name: "Alice Brown",
-//       email: "alice@example.com",
-//       orders: 15,
-//       joined: "2023-12-05",
-//     },
-//     {
-//       id: 5,
-//       name: "Charlie Wilson",
-//       email: "charlie@example.com",
-//       orders: 3,
-//       joined: "2024-04-22",
-//     },
-//   ];
-const handleLogOut = () => {
-  dispatch(logOut());
-  Cookies.remove("user");
-  Cookies.remove("token");
-  navigator("/");
-};
-  const sellers = [
-    {
-      id: 1,
-      name: "TechStore",
-      products: 145,
-      revenue: 45289.5,
-      rating: 4.8,
-      joined: "2023-06-10",
-    },
-    {
-      id: 2,
-      name: "SportsMart",
-      products: 89,
-      revenue: 32150.75,
-      rating: 4.6,
-      joined: "2023-08-15",
-    },
-    {
-      id: 3,
-      name: "HomeGoods",
-      products: 210,
-      revenue: 67890.25,
-      rating: 4.9,
-      joined: "2023-05-20",
-    },
-    {
-      id: 4,
-      name: "GadgetHub",
-      products: 76,
-      revenue: 28340.0,
-      rating: 4.7,
-      joined: "2023-09-01",
-    },
-  ];
-
-//   const revenueData = {
-//     total: 173670.5,
-//     thisMonth: 45289.5,
-//     lastMonth: 38950.25,
-//     growth: 16.3,
-//   };
+  const handleLogOut = () => {
+    dispatch(logOut());
+    Cookies.remove("user");
+    Cookies.remove("token");
+    navigator("/");
+  };
 
   const handleDeleteProduct = (id) => {
     // setProducts(products.filter((p) => p.id !== id));
     dispatch(deleteProduct(id));
   };
-
-  // const getStatusColor = (status) => {
-  //   switch (status) {
-  //     case "Delivered":
-  //       return "bg-green-100 text-green-800";
-  //     case "Shipped":
-  //       return "bg-blue-100 text-blue-800";
-  //     case "Processing":
-  //       return "bg-yellow-100 text-yellow-800";
-  //     default:
-  //       return "bg-gray-100 text-gray-800";
-  //   }
-  // };
+  const [showCreateAccountModal, setShowCreateAccountModal] = useState(false);
+  const [newAccount, setNewAccount] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "",
+  });
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    dispatch(createAcountByAdmin(newAccount));
+    setShowCreateAccountModal(false);
+    setNewAccount({ name: "", email: "", password: "", role: "" });
+  };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-    <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-    <button
-      className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-      onClick={handleLogOut}
-    >
-      <LogOut className="w-5 h-5" />
-      <span>Logout</span>
-    </button>
-  </div>
-</header>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+         <div>
+           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <p>{user?.name}</p>
+          <p>{user?.email}</p>
+         </div>
+          <button
+            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+            onClick={handleLogOut}
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
@@ -345,7 +199,7 @@ const handleLogOut = () => {
                       </h3>
                       <TrendingUp className="w-6 h-6 text-blue-600" />
                     </div> */}
-                    {/* <div className="space-y-3">
+                  {/* <div className="space-y-3">
                       <div>
                         <p className="text-sm text-gray-600">This Month</p>
                         <p className="text-2xl font-bold text-gray-900">
@@ -374,7 +228,7 @@ const handleLogOut = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Active Sellers</span>
                         <span className="font-semibold text-gray-900">
-                          {sellers.length}
+                          {sellerStats.length}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -392,9 +246,7 @@ const handleLogOut = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Pending Orders</span>
                         <span className="font-semibold text-gray-900">
-                          {
-                            pendingOrderCount
-                          }
+                          {pendingOrderCount}
                         </span>
                       </div>
                     </div>
@@ -595,7 +447,7 @@ const handleLogOut = () => {
             )}
 
             {/* Users Tab */}
-            {activeTab === "users" && (
+            {/* {activeTab === "users" && (
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   All Users
@@ -613,9 +465,7 @@ const handleLogOut = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Orders
                         </th>
-                        {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                          Joined
-                        </th> */}
+                       
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Total Purchase
                         </th>
@@ -634,17 +484,179 @@ const handleLogOut = () => {
                             {user.orderCount}
                           </td>
                          
-                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {user.createdAt}
-                          </td> */}
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                             {user.totalOrderAmount}
                           </td>
-                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <button className="text-blue-600 hover:text-blue-800">
-                              <Eye className="w-5 h-5" />
-                            </button>
-                          </td> */}
+                          
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )} */}
+            {activeTab === "users" && (
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    All Users
+                  </h2>
+                  <button
+                    onClick={() => setShowCreateAccountModal(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  >
+                    <span>+</span>
+                    Create Account
+                  </button>
+                </div>
+
+                {/* Create Account Modal */}
+                {showCreateAccountModal && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Create New Account
+                      </h3>
+                      <form
+                        onSubmit={handleCreateAccount}
+                        className="space-y-4"
+                      >
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Name
+                          </label>
+                          <input
+                            type="text"
+                            value={newAccount.name}
+                            onChange={(e) =>
+                              setNewAccount({
+                                ...newAccount,
+                                name: e.target.value,
+                              })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            value={newAccount.email}
+                            onChange={(e) =>
+                              setNewAccount({
+                                ...newAccount,
+                                email: e.target.value,
+                              })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Password
+                          </label>
+                          <input
+                            type="password"
+                            value={newAccount.password}
+                            onChange={(e) =>
+                              setNewAccount({
+                                ...newAccount,
+                                password: e.target.value,
+                              })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Role
+                          </label>
+                          <select
+                            value={newAccount.role}
+                            onChange={(e) =>
+                              setNewAccount({
+                                ...newAccount,
+                                role: e.target.value,
+                              })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            required
+                          >
+                            <option value="">Select Role</option>
+                            <option value="seller">Seller</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowCreateAccountModal(false);
+                              setNewAccount({
+                                name: "",
+                                email: "",
+                                password: "",
+                                role: "",
+                              });
+                            }}
+                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            Create Account
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Orders
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Total Purchase
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {userOrder.map((user) => (
+                        <tr key={user.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {user.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {user.orderCount}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {user.totalOrderAmount}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -696,7 +708,6 @@ const handleLogOut = () => {
                           </span>
                         </div> */}
                       </div>
-                     
                     </div>
                   ))}
                 </div>
