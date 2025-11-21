@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 export const createAcountByAdmin = createAsyncThunk("create_acount", async (data) => {
   try {
-    const res = await axios.post("http://localhost:5000/user/registerByAdmin",data);
+    const res = await axios.post("https://e-commerce-q22t.onrender.com/user/registerByAdmin",data);
 
     console.log("response from api ", res.data);
 
@@ -13,7 +13,7 @@ export const createAcountByAdmin = createAsyncThunk("create_acount", async (data
 });
 export const getAllProductsWithoutPagination = createAsyncThunk("all_product", async () => {
   try {
-    const res = await axios.get("http://localhost:5000/analytics/all/products");
+    const res = await axios.get("https://e-commerce-q22t.onrender.com/analytics/all/products");
 
     console.log("response from api ", res.data);
 
@@ -24,7 +24,7 @@ export const getAllProductsWithoutPagination = createAsyncThunk("all_product", a
 });
 export const getAllOrders = createAsyncThunk("all_orders", async () => {
   try {
-    const res = await axios.get("http://localhost:5000/analytics/all_orders");
+    const res = await axios.get("https://e-commerce-q22t.onrender.com/analytics/all_orders");
 
     console.log("response from api ", res.data);
 
@@ -35,7 +35,7 @@ export const getAllOrders = createAsyncThunk("all_orders", async () => {
 });
 export const getAllUsers = createAsyncThunk("all_users", async () => {
   try {
-    const res = await axios.get("http://localhost:5000/analytics/all_users");
+    const res = await axios.get("https://e-commerce-q22t.onrender.com/analytics/all_users");
 
     console.log("response from api ", res.data);
 
@@ -48,7 +48,7 @@ export const getAllUsers = createAsyncThunk("all_users", async () => {
 export const getAllOrdersByUser = createAsyncThunk("all_usersOrders", async () => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get("http://localhost:5000/analytics/orders_per_user", {
+    const res = await axios.get("https://e-commerce-q22t.onrender.com/analytics/orders_per_user", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -64,7 +64,7 @@ export const getAllOrdersByUser = createAsyncThunk("all_usersOrders", async () =
 export const getAllSellersStats = createAsyncThunk("sellers_stats", async () => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get("http://localhost:5000/analytics/sellers_stats", {
+    const res = await axios.get("https://e-commerce-q22t.onrender.com/analytics/sellers_stats", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

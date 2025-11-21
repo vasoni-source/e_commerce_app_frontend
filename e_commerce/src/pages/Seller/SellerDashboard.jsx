@@ -581,7 +581,7 @@ export default function SellerDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {allOrdersPerSeller.map((order) => (
+                  {allOrdersPerSeller?.map((order) => (
                     <tr key={order._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
                         #{order._id}

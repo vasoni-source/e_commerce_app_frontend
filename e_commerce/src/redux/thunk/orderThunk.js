@@ -11,7 +11,7 @@ export const createOrder = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/order",
+        "https://e-commerce-q22t.onrender.com/order",
         {
           orderItems,
           totalPrice,
@@ -42,7 +42,7 @@ export const getOrders = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/order/ordersByUser", {
+      const res = await axios.get("https://e-commerce-q22t.onrender.com/order/ordersByUser", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -64,7 +64,7 @@ export const cancelOrder = createAsyncThunk(
   async (orderId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`http://localhost:5000/order/${orderId}`, {
+      const res = await axios.delete(`https://e-commerce-q22t.onrender.com/order/${orderId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

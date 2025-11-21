@@ -5,6 +5,7 @@ import AppRouter from "./router/AppRouter";
 import { useSelector } from "react-redux";
 function App() {
   const user = useSelector((state)=>state.user.user);
+  console.log("user from appjsx",user);
   return (
     <div>
       <BrowserRouter>

@@ -7,7 +7,7 @@ export const signUp = createAsyncThunk(
   
     console.log("formdat from thunk",formData);
     try {
-      const res = await axios.post("http://localhost:5000/user/register/verify-otp", {
+      const res = await axios.post("https://e-commerce-q22t.onrender.com/user/register/verify-otp", {
         name:formData.name,email:formData.email,password:formData.password,otp:formData.otp
       });
 
@@ -26,7 +26,7 @@ export const loginWithPassword = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const res = await axios.post("http://localhost:5000/user/login", {
+      const res = await axios.post("https://e-commerce-q22t.onrender.com/user/login", {
         email,
         password,
       });
@@ -51,7 +51,7 @@ export const forgotPassword = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/user/forgot-password",
+        "https://e-commerce-q22t.onrender.com/user/forgot-password",
         { email }
       );
       return res.data;
@@ -69,7 +69,7 @@ export const resetPassword = createAsyncThunk(
   async ({ token, password }, { rejectWithValue }) => {
     try {
       const res = await axios.patch(
-        "http://localhost:5000/user/reset-password",
+        "https://e-commerce-q22t.onrender.com/user/reset-password",
         { token, password }
       );
 
@@ -81,3 +81,4 @@ export const resetPassword = createAsyncThunk(
     }
   }
 );
+ 

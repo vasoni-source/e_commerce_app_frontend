@@ -8,7 +8,7 @@ export const addToWishlist = createAsyncThunk(
       const token = localStorage.getItem("token");
       console.log("token", token);
       const res = await axios.post(
-        "http://localhost:5000/wishlist",
+        "https://e-commerce-q22t.onrender.com/wishlist",
         {
           productId,
         },
@@ -37,7 +37,7 @@ export const getWishlist = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       console.log("token", token);
-      const res = await axios.get("http://localhost:5000/wishlist", {
+      const res = await axios.get("https://e-commerce-q22t.onrender.com/wishlist", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -54,31 +54,4 @@ export const getWishlist = createAsyncThunk(
     }
   }
 );
-// export const removeWishlistItem = createAsyncThunk(
-//   "remove_wishlistItem",
-//   async (productId, { rejectWithValue }) => {
-//     console.log("prdocustId",productId)
-//     try {
-//       const token = localStorage.getItem("token");
-//       console.log("token", token);
-//       const res = await axios.delete(
-//         "http://localhost:5000/wishlist",{
-//         data:{ productId },
-        
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
 
-//       console.log("wishlist data from api ", res.data);
-
-//       return res.data.cart;
-//     } catch (error) {
-//       console.log("error", error);
-//       return rejectWithValue(
-//         error.response?.data?.message || "Failed to remove wishlist Please try again."
-//       );
-//     }
-//   }
-// );

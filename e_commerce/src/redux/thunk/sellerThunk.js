@@ -7,7 +7,7 @@ export const sellerRevenue = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:5000/analytics/revenue_per_seller",
+        "https://e-commerce-q22t.onrender.com/analytics/revenue_per_seller",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -31,7 +31,7 @@ export const orderPerSeller = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:5000/order/sellerOrders",
+        "https://e-commerce-q22t.onrender.com/order/sellerOrders",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ export const updateOrderField = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await axios.patch(
-        `http://localhost:5000/order/${orderId}`,{status},
+        `https://e-commerce-q22t.onrender.com/order/${orderId}`,{status},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -79,7 +79,7 @@ export const productPerSeller = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:5000/analytics/seller_products",
+        "https://e-commerce-q22t.onrender.com/analytics/seller_products",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -111,7 +111,7 @@ export const createProduct = createAsyncThunk(
       formData.append("description", product.description);
       formData.append("image", product.image); 
       const res = await axios.post(
-        "http://localhost:5000/product",formData,
+        "https://e-commerce-q22t.onrender.com/product",formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -144,7 +144,7 @@ export const updateProduct = createAsyncThunk(
       formData.append("description", product.description);
       formData.append("image", product.image); 
       const res = await axios.patch(
-        `http://localhost:5000/product/${product._id}`,formData,
+        `https://e-commerce-q22t.onrender.com/product/${product._id}`,formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -171,7 +171,7 @@ export const deleteProduct = createAsyncThunk(
       const token = localStorage.getItem("token");
       
       const res = await axios.delete(
-        `http://localhost:5000/product/${id}`,
+        `https://e-commerce-q22t.onrender.com/product/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -7,7 +7,7 @@ export const addToCart = createAsyncThunk(
       const token = localStorage.getItem("token");
       console.log("token", token);
       const res = await axios.post(
-        "http://localhost:5000/cart",
+        "https://e-commerce-q22t.onrender.com/cart",
         {
           productId,
           quantity,
@@ -37,7 +37,7 @@ export const getCart = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       console.log("token", token);
-      const res = await axios.get("http://localhost:5000/cart", {
+      const res = await axios.get("https://e-commerce-q22t.onrender.com/cart", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -62,7 +62,7 @@ export const removeCartItem = createAsyncThunk(
       const token = localStorage.getItem("token");
       console.log("token", token);
       const res = await axios.delete(
-        "http://localhost:5000/cart",{
+        "https://e-commerce-q22t.onrender.com/cart",{
         data:{ productId },
         
           headers: {

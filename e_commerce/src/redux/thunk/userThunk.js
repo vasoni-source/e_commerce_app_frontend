@@ -8,7 +8,7 @@ const updateUserField = createAsyncThunk(
         console.log("formdat from thunk", data);
         try {
             const token = localStorage.getItem("token");
-            const res = await axios.patch("http://localhost:5000/user/update", 
+            const res = await axios.patch("https://e-commerce-q22t.onrender.com/user/update", 
                 data,{
                     headers: {
                       Authorization: `Bearer ${token}`,

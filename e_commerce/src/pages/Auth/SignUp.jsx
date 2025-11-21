@@ -35,7 +35,7 @@ export default function SignUp() {
     try {
       console.log("inside try");
       const res = await axios.post(
-        "http://localhost:5000/user/register/send-otp",
+        "https://e-commerce-q22t.onrender.com/user/register/send-otp",
         { email }
       );
       console.log("response", res);
